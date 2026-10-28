@@ -10,6 +10,17 @@ service cloud.firestore {
     }
     match /catalogos/{id} { allow read, write: if admin(); }
     match /trabajadores/{id} { allow read, write: if admin(); }
+    match /rutas/{codigo} {
+      allow get: if resource.data.activo == true || admin();
+      allow list, create, delete: if admin();
+      allow update: if admin() || (
+        resource.data.activo == true &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['completadas', 'actualizado']) &&
+        request.resource.data.completadas is list &&
+        request.resource.data.completadas.size() <= resource.data.misiones.size() &&
+        request.resource.data.actualizado == request.time
+      );
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }
