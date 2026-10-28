@@ -9,6 +9,7 @@ service cloud.firestore {
       allow list, write: if admin();
     }
     match /catalogos/{id} { allow read, write: if admin(); }
+    match /trabajadores/{id} { allow read, write: if admin(); }
     match /{document=**} { allow read, write: if false; }
   }
 }
