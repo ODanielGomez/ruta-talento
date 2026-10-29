@@ -14,8 +14,8 @@ export async function gestionarRuta(worker){
     const rutaRef=doc(db,'rutas',token),snapshot=await getDoc(rutaRef);
     if(!snapshot.exists())throw new Error('La ruta guardada no existe; no se ha modificado el avance.');
     const old=snapshot.data(),previous=Array.isArray(old.misiones)?old.misiones:[];
-    const sameOrder=previous.length===misiones.length&&previous.every((m,i)=>m.competencia===misiones[i].competencia);
-    if(!sameOrder)throw new Error('Cambió la cantidad o el orden de competencias. Por seguridad no actualizamos la ruta ni el avance automáticamente.');
+    const existingUnchanged=previous.length<=misiones.length&&previous.every((m,i)=>m.competencia===misiones[i].competencia);
+    if(!existingUnchanged)throw new Error('Las competencias existentes cambiaron de orden, se quitaron o se renombraron. No actualizamos la ruta para proteger el avance; agregar al final sí está permitido.');
     await updateDoc(rutaRef,{nombre:data.nombre||'',misiones,actualizado:serverTimestamp()});
   }
   let url=new URL('ruta.html',location.href);url.searchParams.set('r',token);return url.href;
